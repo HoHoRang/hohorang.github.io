@@ -59,7 +59,7 @@ develop 에서 글 작성 → push → (자동) develop → main PR 생성 → �
 ```
 
 1. `develop` 브랜치에서 글을 쓰고 push합니다.
-2. `ci.yml`이 타입 검사와 빌드를 돌립니다. frontmatter 오류가 있으면 여기서 실패합니다.
+2. `ci.yml`이 타입 검사와 빌드를 돌립니다(main 외 모든 브랜치 push). frontmatter 오류가 있으면 여기서 실패합니다.
 3. `publish-pr.yml`이 `develop → main` PR을 만듭니다. 이미 열려 있으면 본문의 "반영할 글" 목록만 갱신합니다.
 4. PR을 **Create a merge commit**으로 머지하면 `deploy.yml`이 GitHub Pages에 배포합니다.
    - Squash로 머지하면 `develop`과 `main`의 히스토리가 갈라져서 다음 PR에 이미 반영된 커밋이 다시 섞입니다.

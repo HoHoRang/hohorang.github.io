@@ -1,12 +1,11 @@
 name: CI
 
-# develop에 push하거나 main으로 PR이 올라오면 타입 검사와 빌드를 돌린다.
-# frontmatter 오타(카테고리 등)도 여기서 걸러진다.
+# main 외의 브랜치에 push하면 타입 검사와 빌드를 돌린다. frontmatter 오타(카테고리 등)도 여기서 걸러진다.
+# PR의 head 커밋에 이 결과가 붙으므로 pull_request 트리거는 쓰지 않는다.
+# (봇이 연 PR의 pull_request 실행은 수동 승인을 기다리며 멈춰 있기 때문)
 on:
   push:
-    branches: [develop]
-  pull_request:
-    branches: [main]
+    branches-ignore: [main]
 
 permissions:
   contents: read
