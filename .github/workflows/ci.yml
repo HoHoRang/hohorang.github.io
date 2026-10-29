@@ -1,0 +1,30 @@
+name: CI
+
+# develop에 push하거나 main으로 PR이 올라오면 타입 검사와 빌드를 돌린다.
+# frontmatter 오타(카테고리 등)도 여기서 걸러진다.
+on:
+  push:
+    branches: [develop]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - run: npm run build

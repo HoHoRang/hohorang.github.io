@@ -1,0 +1,62 @@
+name: Publish PR
+
+# develop에 push하면 main으로 가는 PR을 만들고, 이미 열려 있으면 본문의 글 목록을 갱신한다.
+# 저장소 설정에서 "Allow GitHub Actions to create and approve pull requests"가 켜져 있어야 한다.
+on:
+  push:
+    branches: [develop]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: publish-pr
+  cancel-in-progress: true
+
+jobs:
+  open-pr:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - name: Open or update PR
+        run: |
+          set -euo pipefail
+
+          ahead=$(gh api "repos/$GH_REPO/compare/main...develop" --jq '.ahead_by')
+          if [ "$ahead" = "0" ]; then
+            echo "develop has no commits ahead of main"
+            exit 0
+          fi
+
+          # 바뀐 글 목록 (src/content/posts/<slug>/index.md)
+          posts=$(gh api "repos/$GH_REPO/compare/main...develop" --paginate \
+            --jq '.files[] | select(.filename | test("^src/content/posts/[^/]+/index\\.mdx?$")) | "\(.status)\t\(.filename)"' \
+            | sort -u \
+            | awk -F'\t' '{ split($2, p, "/"); label = ($1 == "added") ? "새 글" : ($1 == "removed") ? "삭제" : "수정"; print "- " label ": `" p[4] "`" }')
+          others=$(gh api "repos/$GH_REPO/compare/main...develop" --paginate \
+            --jq '[.files[] | select(.filename | test("^src/content/posts/") | not)] | length')
+
+          {
+            echo "## 반영할 글"
+            echo
+            if [ -n "$posts" ]; then echo "$posts"; else echo "- 바뀐 글 없음"; fi
+            if [ "$others" != "0" ]; then
+              echo
+              echo "글 외에 사이트 코드·설정 파일 ${others}개가 함께 바뀌었습니다."
+            fi
+            echo
+            echo "머지하면 GitHub Pages에 배포됩니다. 머지 방식은 **Create a merge commit**을 사용하세요."
+          } > body.md
+
+          number=$(gh pr list --base main --head develop --state open --json number --jq '.[0].number // empty')
+          if [ -n "$number" ]; then
+            gh pr edit "$number" --body-file body.md
+            echo "Updated PR #$number"
+          else
+            gh pr create --base main --head develop \
+              --title "Publish: $(TZ=Asia/Seoul date +%Y-%m-%d)" \
+              --body-file body.md
+          fi
