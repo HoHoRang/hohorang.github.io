@@ -1,5 +1,6 @@
 ---
 import { SITE } from '../consts';
+import NewMark from './NewMark.astro';
 import { getPosts, categoryCounts, categoryUrl } from '../lib/posts';
 
 const posts = await getPosts();
@@ -48,17 +49,19 @@ const current = Astro.url.pathname;
   <a class="drawer-all" href="/">전체 글 <span class="count">{posts.length}</span></a>
   <ul class="tree">
     {
-      tree.map(({ category, count, children }) => (
+      tree.map(({ category, count, latest, children }) => (
         <li>
           <a class="top" href={categoryUrl(category)}>
-            {category.emoji} {category.name} <span class="count">{count}</span>
+            {category.emoji} {category.name} <NewMark variant="dot" date={latest} />
+            <span class="count">{count}</span>
           </a>
           {children.length > 0 && (
             <ul>
               {children.map((child) => (
                 <li>
                   <a href={categoryUrl(child.category)}>
-                    {child.category.name} <span class="count">{child.count}</span>
+                    {child.category.name} <NewMark variant="dot" date={child.latest} />
+                    <span class="count">{child.count}</span>
                   </a>
                 </li>
               ))}

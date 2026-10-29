@@ -22,20 +22,30 @@ export function postsInCategory(posts: Post[], category: CategoryInfo): Post[] {
   );
 }
 
-export interface CategoryCount {
+export interface CategoryStat {
   category: CategoryInfo;
   count: number;
-  children: { category: CategoryInfo; count: number }[];
+  // 가장 최근 글의 발행일 (NEW 표시용)
+  latest?: Date;
+}
+
+export interface CategoryCount extends CategoryStat {
+  children: CategoryStat[];
+}
+
+// posts는 최신순이어야 한다 (getPosts 결과).
+export function categoryStat(posts: Post[], category: CategoryInfo): CategoryStat {
+  const list = postsInCategory(posts, category);
+  return { category, count: list.length, latest: list[0]?.data.pubDate };
 }
 
 // 글이 하나도 없는 카테고리는 숨긴다.
 export function categoryCounts(posts: Post[]): CategoryCount[] {
   return CATEGORY_TREE.map((top) => {
-    const category = getCategory(top.name);
     const children = CATEGORIES.filter((c) => c.parent === top.name)
-      .map((c) => ({ category: c, count: postsInCategory(posts, c).length }))
+      .map((c) => categoryStat(posts, c))
       .filter((c) => c.count > 0);
-    return { category, count: postsInCategory(posts, category).length, children };
+    return { ...categoryStat(posts, getCategory(top.name)), children };
   }).filter((c) => c.count > 0);
 }
 

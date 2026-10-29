@@ -1,5 +1,6 @@
 ---
 import AdSlot from './AdSlot.astro';
+import NewMark from './NewMark.astro';
 import { getCategory } from '../data/categories';
 import { categoryUrl, formatDate, postUrl, tagUrl, type Post } from '../lib/posts';
 
@@ -24,6 +25,7 @@ const { posts, adAfter = 0 } = Astro.props;
                 {post.data.category.replace('/', ' › ')}
               </a>
               <time datetime={post.data.pubDate.toISOString()}>{formatDate(post.data.pubDate)}</time>
+              <NewMark date={post.data.pubDate} />
             </div>
             <h2>
               <a href={postUrl(post)}>{post.data.title}</a>
@@ -63,6 +65,7 @@ const { posts, adAfter = 0 } = Astro.props;
   }
   .meta {
     display: flex;
+    align-items: center;
     gap: 12px;
     font-size: 0.8125rem;
     color: var(--text-muted);

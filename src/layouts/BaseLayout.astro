@@ -75,5 +75,13 @@ export type Props = SEOProps;
       <slot />
     </main>
     <Footer />
+
+    <!-- NewMark: 오늘 기준으로 기간 안에 발행된 글·카테고리만 표시 -->
+    <script is:inline define:vars={{ days: SITE.newPostDays }}>
+      const since = Date.now() - days * 24 * 60 * 60 * 1000;
+      document.querySelectorAll('[data-new-since]').forEach((el) => {
+        if (Date.parse(el.dataset.newSince) >= since) el.hidden = false;
+      });
+    </script>
   </body>
 </html>

@@ -1,4 +1,5 @@
 ---
+import NewMark from './NewMark.astro';
 import { categoryCounts, categoryUrl, type Post } from '../lib/posts';
 
 export interface Props {
@@ -14,9 +15,9 @@ const tops = categoryCounts(posts);
 <nav class="tabs" aria-label="카테고리">
   <a href="/" aria-current={!active ? 'page' : undefined}>전체 <span>{posts.length}</span></a>
   {
-    tops.map(({ category, count }) => (
+    tops.map(({ category, count, latest }) => (
       <a href={categoryUrl(category)} aria-current={active === category.key ? 'page' : undefined}>
-        {category.name} <span>{count}</span>
+        {category.name} <NewMark variant="dot" date={latest} /> <span>{count}</span>
       </a>
     ))
   }
