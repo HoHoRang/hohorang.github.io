@@ -1,0 +1,51 @@
+---
+import { SITE } from '../consts';
+---
+
+<section class="profile">
+  <img src="https://github.com/HoHoRang.png?size=160" alt="" width="64" height="64" />
+  <div>
+    <p class="name">{SITE.author}</p>
+    <p class="bio">{SITE.description}</p>
+    <div class="links">
+      <a href={SITE.github} target="_blank" rel="noopener">GitHub</a>
+      <a href="/about/">About</a>
+      <a href="/rss.xml">RSS</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .profile {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 40px 0 32px;
+  }
+  img {
+    flex: none;
+    border-radius: 50%;
+    background: var(--bg-soft);
+  }
+  p {
+    margin: 0;
+  }
+  .name {
+    font-weight: 800;
+    font-size: 1.125rem;
+  }
+  .bio {
+    color: var(--text-muted);
+    font-size: 0.9375rem;
+  }
+  .links {
+    display: flex;
+    gap: 12px;
+    margin-top: 2px;
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+  }
+  .links a:hover {
+    color: var(--accent);
+  }
+</style>

@@ -1,0 +1,63 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CategoryTabs from '../../components/CategoryTabs.astro';
+import PostList from '../../components/PostList.astro';
+import { CATEGORIES } from '../../data/categories';
+import { categoryUrl, getPosts, postsInCategory } from '../../lib/posts';
+
+export const getStaticPaths = (async () => {
+  const posts = await getPosts();
+  return CATEGORIES.map((category) => ({
+    params: { path: category.path },
+    props: { category, list: postsInCategory(posts, category) },
+  })).filter(({ props }) => props.list.length > 0);
+}) satisfies GetStaticPaths;
+
+const { category, list } = Astro.props;
+const posts = await getPosts();
+const parent = category.parent ? CATEGORIES.find((c) => c.key === category.parent) : undefined;
+const children = CATEGORIES.filter((c) => c.parent === category.key)
+  .map((c) => ({ c, count: postsInCategory(posts, c).length }))
+  .filter(({ count }) => count > 0);
+const label = category.key.replace('/', ' › ');
+---
+
+<BaseLayout title={label} description={`${label} 카테고리의 글 ${list.length}개`}>
+  <div class="container">
+    <h1 class="page-title">
+      {parent && <a class="parent" href={categoryUrl(parent)}>{parent.name} ›</a>}
+      {category.emoji} {category.name}
+    </h1>
+    <p class="page-desc">{list.length}개의 글</p>
+    <CategoryTabs posts={posts} active={parent?.key ?? category.key} />
+    {
+      children.length > 0 && (
+        <div class="subs">
+          {children.map(({ c, count }) => (
+            <a class="chip" href={categoryUrl(c)}>
+              {c.name} <span class="count">{count}</span>
+            </a>
+          ))}
+        </div>
+      )
+    }
+    <PostList posts={list} adAfter={5} />
+  </div>
+</BaseLayout>
+
+<style>
+  .parent {
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+  .parent:hover {
+    color: var(--accent);
+  }
+  .subs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+</style>

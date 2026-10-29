@@ -1,0 +1,85 @@
+---
+import type { MarkdownHeading } from 'astro';
+
+export interface Props {
+  headings: MarkdownHeading[];
+}
+
+const headings = Astro.props.headings.filter((h) => h.depth === 2 || h.depth === 3);
+---
+
+{
+  headings.length > 1 && (
+    <nav class="toc" aria-label="목차">
+      <p class="toc-title">목차</p>
+      <ul>
+        {headings.map((h) => (
+          <li class={`d${h.depth}`}>
+            <a href={`#${h.slug}`} data-toc-link={h.slug}>
+              {h.text}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  )
+}
+
+<script>
+  // 현재 읽고 있는 제목을 목차에서 강조한다.
+  const links = new Map(
+    [...document.querySelectorAll<HTMLAnchorElement>('[data-toc-link]')].map((a) => [a.dataset.tocLink!, a]),
+  );
+  if (links.size > 0) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          links.forEach((a) => a.classList.remove('active'));
+          links.get(entry.target.id)?.classList.add('active');
+        }
+      },
+      { rootMargin: '-70px 0px -70% 0px' },
+    );
+    links.forEach((_, id) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+  }
+</script>
+
+<style>
+  .toc {
+    font-size: 0.8125rem;
+    line-height: 1.5;
+  }
+  .toc-title {
+    margin: 0 0 8px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-left: 2px solid var(--border);
+  }
+  li a {
+    display: block;
+    margin-left: -2px;
+    padding: 4px 0 4px 12px;
+    border-left: 2px solid transparent;
+    color: var(--text-muted);
+  }
+  li.d3 a {
+    padding-left: 24px;
+  }
+  li a:hover {
+    color: var(--text);
+  }
+  li a:global(.active) {
+    border-left-color: var(--accent);
+    color: var(--accent);
+    font-weight: 600;
+  }
+</style>

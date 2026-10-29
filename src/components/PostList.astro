@@ -1,0 +1,106 @@
+---
+import AdSlot from './AdSlot.astro';
+import { getCategory } from '../data/categories';
+import { categoryUrl, formatDate, postUrl, tagUrl, type Post } from '../lib/posts';
+
+export interface Props {
+  posts: Post[];
+  // 목록 중간에 광고를 넣을 위치 (0이면 넣지 않음)
+  adAfter?: number;
+}
+
+const { posts, adAfter = 0 } = Astro.props;
+---
+
+<ul class="post-list">
+  {
+    posts.map((post, i) => {
+      const category = getCategory(post.data.category);
+      return (
+        <>
+          <li class="post-item">
+            <div class="meta">
+              <a class="category" href={categoryUrl(category)}>
+                {post.data.category.replace('/', ' › ')}
+              </a>
+              <time datetime={post.data.pubDate.toISOString()}>{formatDate(post.data.pubDate)}</time>
+            </div>
+            <h2>
+              <a href={postUrl(post)}>{post.data.title}</a>
+            </h2>
+            <p class="desc">{post.data.description}</p>
+            {post.data.tags.length > 0 && (
+              <div class="tags">
+                {post.data.tags.slice(0, 5).map((tag) => (
+                  <a href={tagUrl(tag)}>#{tag}</a>
+                ))}
+              </div>
+            )}
+          </li>
+          {adAfter > 0 && i + 1 === adAfter && posts.length > adAfter && (
+            <li class="ad-item">
+              <AdSlot slot="listInline" />
+            </li>
+          )}
+        </>
+      );
+    })
+  }
+</ul>
+
+<style>
+  .post-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .post-item {
+    padding: 28px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .post-item:first-child {
+    padding-top: 8px;
+  }
+  .meta {
+    display: flex;
+    gap: 12px;
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+  }
+  .category {
+    color: var(--accent);
+    font-weight: 600;
+  }
+  h2 {
+    margin: 6px 0 6px;
+    font-size: 1.3125rem;
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+  }
+  h2 a:hover {
+    color: var(--accent);
+  }
+  .desc {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.9375rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 10px;
+    margin-top: 10px;
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+  }
+  .tags a:hover {
+    color: var(--accent);
+  }
+  .ad-item {
+    border-bottom: 1px solid var(--border);
+  }
+</style>

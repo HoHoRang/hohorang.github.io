@@ -1,0 +1,52 @@
+---
+import { INTEGRATIONS } from '../consts';
+
+const { repo, repoId, category, categoryId } = INTEGRATIONS.giscus;
+const enabled = Boolean(repo && repoId && category && categoryId);
+---
+
+{
+  enabled && (
+    <section class="comments" aria-label="댓글" data-pagefind-ignore>
+      <div class="giscus" />
+      <script
+        is:inline
+        define:vars={{ repo, repoId, category, categoryId }}
+      >
+        const s = document.createElement('script');
+        const theme = document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
+        Object.entries({
+          src: 'https://giscus.app/client.js',
+          'data-repo': repo,
+          'data-repo-id': repoId,
+          'data-category': category,
+          'data-category-id': categoryId,
+          'data-mapping': 'pathname',
+          'data-strict': '1',
+          'data-reactions-enabled': '1',
+          'data-input-position': 'top',
+          'data-theme': theme,
+          'data-lang': 'ko',
+          'data-loading': 'lazy',
+          crossorigin: 'anonymous',
+        }).forEach(([k, v]) => s.setAttribute(k, v));
+        s.async = true;
+        document.currentScript.parentElement.appendChild(s);
+
+        // 사이트 테마를 바꾸면 댓글 테마도 맞춘다.
+        window.addEventListener('themechange', (e) => {
+          document.querySelector('iframe.giscus-frame')?.contentWindow?.postMessage(
+            { giscus: { setConfig: { theme: e.detail } } },
+            'https://giscus.app',
+          );
+        });
+      </script>
+    </section>
+  )
+}
+
+<style>
+  .comments {
+    margin-top: 48px;
+  }
+</style>

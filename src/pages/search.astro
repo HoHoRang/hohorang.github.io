@@ -1,0 +1,45 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="검색" description="블로그 글을 검색합니다." noindex>
+  <div class="container">
+    <h1 class="page-title">Search</h1>
+    <p class="page-desc">제목, 본문, 태그로 검색할 수 있습니다.</p>
+    <link href="/pagefind/pagefind-ui.css" rel="stylesheet" />
+    <div id="search"></div>
+    {
+      import.meta.env.DEV && (
+        <p class="muted">검색 인덱스는 빌드할 때 만들어집니다. `npm run build && npm run preview`로 확인하세요.</p>
+      )
+    }
+  </div>
+</BaseLayout>
+
+<script is:inline src="/pagefind/pagefind-ui.js"></script>
+<script is:inline>
+  window.addEventListener('DOMContentLoaded', () => {
+    if (!window.PagefindUI) return;
+    const ui = new PagefindUI({
+      element: '#search',
+      showSubResults: true,
+      showImages: false,
+      autofocus: true,
+      translations: { placeholder: '검색어를 입력하세요', zero_results: '[SEARCH_TERM]에 대한 결과가 없습니다' },
+    });
+    const q = new URLSearchParams(location.search).get('q');
+    if (q) ui.triggerSearch(q);
+  });
+</script>
+
+<style is:global>
+  #search {
+    --pagefind-ui-scale: 0.9;
+    --pagefind-ui-primary: var(--accent);
+    --pagefind-ui-text: var(--text);
+    --pagefind-ui-background: var(--bg);
+    --pagefind-ui-border: var(--border);
+    --pagefind-ui-tag: var(--bg-soft);
+    --pagefind-ui-font: var(--font-sans);
+  }
+</style>

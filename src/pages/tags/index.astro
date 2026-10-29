@@ -1,0 +1,35 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { collectTags, getPosts, tagUrl } from '../../lib/posts';
+
+const tags = collectTags(await getPosts());
+---
+
+<BaseLayout title="태그" description="태그별로 글을 모아 봅니다.">
+  <div class="container">
+    <h1 class="page-title">Tags</h1>
+    <p class="page-desc">{tags.length}개의 태그</p>
+    <ul class="cloud">
+      {
+        tags.map(({ tag, count }) => (
+          <li>
+            <a class="chip" href={tagUrl(tag)}>
+              #{tag} <span class="count">{count}</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</BaseLayout>
+
+<style>
+  .cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+</style>

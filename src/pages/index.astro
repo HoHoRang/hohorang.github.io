@@ -1,0 +1,22 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Profile from '../components/Profile.astro';
+import CategoryTabs from '../components/CategoryTabs.astro';
+import PostList from '../components/PostList.astro';
+import Pagination from '../components/Pagination.astro';
+import { SITE } from '../consts';
+import { getPosts } from '../lib/posts';
+
+const posts = await getPosts();
+const totalPages = Math.ceil(posts.length / SITE.postsPerPage);
+---
+
+<BaseLayout>
+  <div class="container">
+    <h1 class="visually-hidden">{SITE.title}</h1>
+    <Profile />
+    <CategoryTabs posts={posts} />
+    <PostList posts={posts.slice(0, SITE.postsPerPage)} adAfter={5} />
+    <Pagination current={1} total={totalPages} href={(p) => (p === 1 ? '/' : `/page/${p}/`)} />
+  </div>
+</BaseLayout>

@@ -1,0 +1,55 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { collectSeries, formatDate, getPosts, seriesUrl } from '../../lib/posts';
+
+const series = collectSeries(await getPosts());
+---
+
+<BaseLayout title="시리즈" description="강의 정리처럼 순서대로 읽는 글 묶음입니다.">
+  <div class="container">
+    <h1 class="page-title">Series</h1>
+    <p class="page-desc">순서대로 읽으면 좋은 글 묶음</p>
+    <ul class="series">
+      {
+        series.map(({ series, posts }) => (
+          <li>
+            <a href={seriesUrl(series)}>
+              <strong>{series}</strong>
+              <span class="muted">
+                {posts.length}편 · 최근 업데이트 {formatDate(posts[posts.length - 1].data.pubDate)}
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</BaseLayout>
+
+<style>
+  .series {
+    display: grid;
+    gap: 12px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  a {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 20px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    transition: border-color 0.15s;
+  }
+  a:hover {
+    border-color: var(--accent);
+  }
+  strong {
+    font-size: 1.125rem;
+  }
+  span {
+    font-size: 0.875rem;
+  }
+</style>

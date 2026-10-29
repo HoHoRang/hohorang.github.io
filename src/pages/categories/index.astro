@@ -1,0 +1,70 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { categoryCounts, categoryUrl, getPosts } from '../../lib/posts';
+
+const posts = await getPosts();
+const tree = categoryCounts(posts);
+---
+
+<BaseLayout title="카테고리" description="카테고리별로 글을 모아 봅니다.">
+  <div class="container">
+    <h1 class="page-title">Category</h1>
+    <p class="page-desc">전체 {posts.length}개의 글</p>
+    <div class="grid">
+      {
+        tree.map(({ category, count, children }) => (
+          <section class="card">
+            <h2>
+              <a href={categoryUrl(category)}>
+                {category.emoji} {category.name}
+                <span class="count">{count}</span>
+              </a>
+            </h2>
+            <ul>
+              {children.map((child) => (
+                <li>
+                  <a class="chip" href={categoryUrl(child.category)}>
+                    {child.category.name} <span class="count">{child.count}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))
+      }
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .grid {
+    display: grid;
+    gap: 16px;
+  }
+  .card {
+    padding: 20px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+  }
+  h2 {
+    margin: 0 0 12px;
+    font-size: 1.125rem;
+  }
+  h2 a:hover {
+    color: var(--accent);
+  }
+  h2 .count {
+    margin-left: 4px;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+  ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+</style>

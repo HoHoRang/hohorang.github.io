@@ -1,0 +1,23 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE } from '../consts';
+import '../styles/prose.css';
+---
+
+<BaseLayout title="About" description={`${SITE.author} 소개`}>
+  <div class="container">
+    <h1 class="page-title">About</h1>
+    <div class="prose">
+      <p>안녕하세요, {SITE.author}입니다.</p>
+      <p>
+        공부한 내용과 개발하면서 겪은 문제를 기록합니다. CS 기초, 언어와 프레임워크, 그리고
+        쿠버네티스와 리눅스 같은 인프라 쪽을 주로 다룹니다.
+      </p>
+      <h2>Links</h2>
+      <ul>
+        <li><a href={SITE.github} target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="/rss.xml">RSS</a></li>
+      </ul>
+    </div>
+  </div>
+</BaseLayout>

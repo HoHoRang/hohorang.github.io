@@ -1,0 +1,58 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { collectSeries, formatDate, getPosts, postUrl, seriesSlug } from '../../lib/posts';
+
+export const getStaticPaths = (async () => {
+  return collectSeries(await getPosts()).map(({ series, posts }) => ({
+    params: { series: seriesSlug(series) },
+    props: { series, posts },
+  }));
+}) satisfies GetStaticPaths;
+
+const { series, posts } = Astro.props;
+---
+
+<BaseLayout title={series} description={`${series} 시리즈 ${posts.length}편`}>
+  <div class="container">
+    <h1 class="page-title">{series}</h1>
+    <p class="page-desc">{posts.length}편 · <a href="/series/">전체 시리즈 보기</a></p>
+    <ol class="list">
+      {
+        posts.map((post) => (
+          <li>
+            <a href={postUrl(post)}>{post.data.title}</a>
+            <time class="muted" datetime={post.data.pubDate.toISOString()}>
+              {formatDate(post.data.pubDate)}
+            </time>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</BaseLayout>
+
+<style>
+  .list {
+    margin: 0;
+    padding-left: 1.5em;
+  }
+  li {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  li::marker {
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+  a {
+    font-weight: 600;
+  }
+  a:hover {
+    color: var(--accent);
+  }
+  time {
+    display: block;
+    font-size: 0.8125rem;
+  }
+</style>

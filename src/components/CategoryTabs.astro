@@ -1,0 +1,56 @@
+---
+import { categoryCounts, categoryUrl, type Post } from '../lib/posts';
+
+export interface Props {
+  posts: Post[];
+  // 현재 선택된 상위 카테고리 key (없으면 '전체')
+  active?: string;
+}
+
+const { posts, active } = Astro.props;
+const tops = categoryCounts(posts);
+---
+
+<nav class="tabs" aria-label="카테고리">
+  <a href="/" aria-current={!active ? 'page' : undefined}>전체 <span>{posts.length}</span></a>
+  {
+    tops.map(({ category, count }) => (
+      <a href={categoryUrl(category)} aria-current={active === category.key ? 'page' : undefined}>
+        {category.name} <span>{count}</span>
+      </a>
+    ))
+  }
+</nav>
+
+<style>
+  .tabs {
+    display: flex;
+    gap: 6px;
+    margin: 0 0 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  a {
+    flex: none;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+  a:hover {
+    color: var(--text);
+    background: var(--bg-soft);
+  }
+  a[aria-current='page'] {
+    background: var(--text);
+    color: var(--bg);
+  }
+  span {
+    font-size: 0.75rem;
+    font-weight: 500;
+    opacity: 0.7;
+  }
+</style>

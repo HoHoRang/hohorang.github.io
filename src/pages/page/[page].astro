@@ -1,0 +1,33 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CategoryTabs from '../../components/CategoryTabs.astro';
+import PostList from '../../components/PostList.astro';
+import Pagination from '../../components/Pagination.astro';
+import { SITE } from '../../consts';
+import { getPosts } from '../../lib/posts';
+
+// 1페이지는 홈(/)이 담당하고, 여기서는 2페이지부터 만든다.
+export const getStaticPaths = (async () => {
+  const posts = await getPosts();
+  const totalPages = Math.ceil(posts.length / SITE.postsPerPage);
+  return Array.from({ length: Math.max(0, totalPages - 1) }, (_, i) => ({
+    params: { page: String(i + 2) },
+    props: { page: i + 2, totalPages },
+  }));
+}) satisfies GetStaticPaths;
+
+const { page, totalPages } = Astro.props;
+const posts = await getPosts();
+const start = (page - 1) * SITE.postsPerPage;
+---
+
+<BaseLayout title={`전체 글 ${page}페이지`}>
+  <div class="container">
+    <h1 class="page-title">전체 글</h1>
+    <p class="page-desc">{page} / {totalPages} 페이지</p>
+    <CategoryTabs posts={posts} />
+    <PostList posts={posts.slice(start, start + SITE.postsPerPage)} adAfter={5} />
+    <Pagination current={page} total={totalPages} href={(p) => (p === 1 ? '/' : `/page/${p}/`)} />
+  </div>
+</BaseLayout>

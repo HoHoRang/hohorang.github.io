@@ -1,0 +1,46 @@
+---
+import { INTEGRATIONS } from '../consts';
+
+export interface Props {
+  slot: keyof typeof INTEGRATIONS.adSlots;
+}
+
+const { slot } = Astro.props;
+const client = INTEGRATIONS.adsenseClient;
+const slotId = INTEGRATIONS.adSlots[slot];
+const enabled = Boolean(client && slotId);
+// 개발 서버에서는 광고 위치를 확인할 수 있게 자리 표시만 한다.
+const showPlaceholder = !enabled && import.meta.env.DEV;
+---
+
+{
+  enabled && (
+    <div class="ad" data-ad={slot} data-pagefind-ignore>
+      <ins
+        class="adsbygoogle"
+        style="display:block"
+        data-ad-client={client}
+        data-ad-slot={slotId}
+        data-ad-format="auto"
+        data-full-width-responsive="true"
+      />
+      <script is:inline>(window.adsbygoogle = window.adsbygoogle || []).push({});</script>
+    </div>
+  )
+}
+{showPlaceholder && <div class="ad placeholder" data-pagefind-ignore>광고 영역 · {slot}</div>}
+
+<style>
+  .ad {
+    margin: 32px 0;
+    min-height: 90px;
+  }
+  .placeholder {
+    display: grid;
+    place-items: center;
+    border: 1px dashed var(--border);
+    border-radius: 12px;
+    color: var(--text-muted);
+    font-size: 0.8125rem;
+  }
+</style>

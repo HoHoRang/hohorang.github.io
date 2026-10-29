@@ -1,0 +1,36 @@
+---
+import { SITE } from '../consts';
+---
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="links">
+      <a href={SITE.github} rel="noopener" target="_blank">GitHub</a>
+      <a href="/rss.xml">RSS</a>
+      <a href="/about/">About</a>
+    </div>
+    <p>© {new Date().getFullYear()} {SITE.author}. All rights reserved.</p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    margin-top: 80px;
+    padding: 32px 0 48px;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    text-align: center;
+  }
+  .links {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+  }
+  .links a:hover {
+    color: var(--accent);
+  }
+  p {
+    margin: 8px 0 0;
+  }
+</style>
