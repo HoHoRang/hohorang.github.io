@@ -7,6 +7,8 @@ export const SITE = {
   locale: 'ko-KR',
   github: 'https://github.com/HoHoRang',
   postsPerPage: 10,
+  // 발행 후 이 기간(일) 동안 글 목록에 NEW, 카테고리에 점을 표시한다.
+  newPostDays: 7,
 };
 
 // 비워 두면 해당 기능은 렌더링되지 않는다.

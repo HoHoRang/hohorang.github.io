@@ -1,0 +1,45 @@
+---
+// 최근 글 표시. 정적 사이트라 빌드 시점이 아니라 브라우저에서 오늘 날짜로 판단한다
+// (BaseLayout의 스크립트가 기간 안이면 hidden을 해제).
+export interface Props {
+  date?: Date;
+  // text: 글 목록의 "NEW", dot: 카테고리 옆 점
+  variant?: 'text' | 'dot';
+}
+
+const { date, variant = 'text' } = Astro.props;
+---
+
+{
+  date &&
+    (variant === 'text' ? (
+      <span class="new-text" data-new-since={date.toISOString()} hidden>
+        NEW
+      </span>
+    ) : (
+      <span class="new-dot" data-new-since={date.toISOString()} title="최근 새 글" hidden>
+        <span class="visually-hidden">새 글</span>
+      </span>
+    ))
+}
+
+<style>
+  .new-text {
+    color: var(--accent);
+    font-size: 0.6875rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+  }
+  .new-dot {
+    display: inline-block;
+    flex: none;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    vertical-align: middle;
+  }
+  [hidden] {
+    display: none !important;
+  }
+</style>

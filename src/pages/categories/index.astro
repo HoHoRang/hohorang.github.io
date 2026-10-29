@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import NewMark from '../../components/NewMark.astro';
 import { categoryCounts, categoryUrl, getPosts } from '../../lib/posts';
 
 const posts = await getPosts();
@@ -12,11 +13,11 @@ const tree = categoryCounts(posts);
     <p class="page-desc">전체 {posts.length}개의 글</p>
     <div class="grid">
       {
-        tree.map(({ category, count, children }) => (
+        tree.map(({ category, count, latest, children }) => (
           <section class="card">
             <h2>
               <a href={categoryUrl(category)}>
-                {category.emoji} {category.name}
+                {category.emoji} {category.name} <NewMark variant="dot" date={latest} />
                 <span class="count">{count}</span>
               </a>
             </h2>
@@ -24,7 +25,8 @@ const tree = categoryCounts(posts);
               {children.map((child) => (
                 <li>
                   <a class="chip" href={categoryUrl(child.category)}>
-                    {child.category.name} <span class="count">{child.count}</span>
+                    {child.category.name} <NewMark variant="dot" date={child.latest} />
+                    <span class="count">{child.count}</span>
                   </a>
                 </li>
               ))}

@@ -4,7 +4,8 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import CategoryTabs from '../../components/CategoryTabs.astro';
 import PostList from '../../components/PostList.astro';
 import { CATEGORIES } from '../../data/categories';
-import { categoryUrl, getPosts, postsInCategory } from '../../lib/posts';
+import NewMark from '../../components/NewMark.astro';
+import { categoryStat, categoryUrl, getPosts, postsInCategory } from '../../lib/posts';
 
 export const getStaticPaths = (async () => {
   const posts = await getPosts();
@@ -18,7 +19,7 @@ const { category, list } = Astro.props;
 const posts = await getPosts();
 const parent = category.parent ? CATEGORIES.find((c) => c.key === category.parent) : undefined;
 const children = CATEGORIES.filter((c) => c.parent === category.key)
-  .map((c) => ({ c, count: postsInCategory(posts, c).length }))
+  .map((c) => categoryStat(posts, c))
   .filter(({ count }) => count > 0);
 const label = category.key.replace('/', ' › ');
 ---
@@ -34,9 +35,10 @@ const label = category.key.replace('/', ' › ');
     {
       children.length > 0 && (
         <div class="subs">
-          {children.map(({ c, count }) => (
+          {children.map(({ category: c, count, latest }) => (
             <a class="chip" href={categoryUrl(c)}>
-              {c.name} <span class="count">{count}</span>
+              {c.name} <NewMark variant="dot" date={latest} />
+              <span class="count">{count}</span>
             </a>
           ))}
         </div>
